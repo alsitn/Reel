@@ -1236,6 +1236,9 @@ jQuery.reel || (function($, window, document, undefined){
                   // - maps alpha angle directly to `fraction`
                   //
                   orient: function(e, alpha, beta, gamma, ev){
+                    if (!slidable || operated) return;
+                    oriented= true;
+                    slidable = false;
                   },
 
                   // ------------------
@@ -1609,7 +1612,7 @@ jQuery.reel || (function($, window, document, undefined){
                     var
                       direction= get(_cwish_) * negative_when(1, get(_backwards_)),
                       ticks= get(_ticks_),
-                      step= (!get(_playing_) || !ticks ? velocity : abs(get(_speed_)) + velocity) / leader(_tempo_),
+                      step= (!get(_playing_) || oriented || !ticks ? velocity : abs(get(_speed_)) + velocity) / leader(_tempo_),
                       fraction= set(_fraction_, get(_fraction_) - step * direction),
                       ticks= !opt.duration ? ticks : ticks > 0 && set(_ticks_, ticks - 1)
                     !ticks && get(_playing_) && t.trigger('stop');
@@ -1652,6 +1655,7 @@ jQuery.reel || (function($, window, document, undefined){
               },
               panned= false,
               wheeled= false,
+              oriented= false,
               delay, // openingDone's delayed play pointer
 
               // - Constructors of UI elements
