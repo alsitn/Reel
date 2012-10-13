@@ -863,6 +863,7 @@ jQuery.reel || (function($, window, document, undefined){
                     no_bias();
                     pool.unbind(on.pool);
                     pools.unbind(pns);
+                    $(window).unbind(ns);
                   },
 
                   // ### `setup` Event ######
@@ -1028,8 +1029,10 @@ jQuery.reel || (function($, window, document, undefined){
                       opening= set(_opening_, false),
                       evnt= _tick_+dot(_opening_)
                     pool.unbind(evnt, on.pool[evnt]);
+                    touchy && opt.orientable && $(window).bind(_deviceorientation_, orient);
                     if (opt.delay > 0) delay= setTimeout(function(){ t.trigger('play') }, opt.delay * 1000)
                     else t.trigger('play');
+                    function orient(e){ return t.trigger('orient', [gyro(e).alpha, gyro(e).beta, gyro(e).gamma, e]) && e.give }
                   },
 
                   // -----------------------
@@ -1221,6 +1224,18 @@ jQuery.reel || (function($, window, document, undefined){
                     ev && (ev.give = false);
                     unidle();
                     t.trigger('up', [ev]);
+                  },
+
+                  // ### `orient` Event ######
+                  // `Event`, IN DEVELOPMENT
+                  //
+                  // Maps Reel to device orientation event which is provided by some touch enabled devices
+                  // with gyroscope inside. Event handler receives all three device orientation angles 
+                  // in arguments. This event:
+                  //
+                  // - maps alpha angle directly to `fraction`
+                  //
+                  orient: function(e, alpha, beta, gamma, ev){
                   },
 
                   // ------------------
@@ -2168,6 +2183,7 @@ jQuery.reel || (function($, window, document, undefined){
     _mouseleave_= _mouse_+'leave'+pns, _mousemove_= _mouse_+'move'+pns, _mouseup_= _mouse_+'up'+pns,
     _mousewheel_= _mouse_+'wheel'+ns, _tick_= 'tick'+ns, _touchcancel_= _touch_+'cancel'+pns,
     _touchend_= _touch_+'end'+pns, _touchstart_= _touch_+'start'+ns, _touchmove_= _touch_+'move'+pns,
+    _deviceorientation_= 'deviceorientation'+ns,
 
     // And some other frequently used Strings.
     //
@@ -2233,6 +2249,7 @@ jQuery.reel || (function($, window, document, undefined){
   function min_max(minimum, maximum, number){ return max(minimum, min(maximum, number)) }
   function negative_when(value, condition){ return abs(value) * (condition ? -1 : 1) }
   function finger(e){ return touchy ? e.touch || e.originalEvent.touches[0] : e }
+  function gyro(e){ return e.originalEvent }
   function px(value){ return value === undefined ? 0 : typeof value == _string_ ? value : value + 'px' }
   function hash(value){ return '#' + value }
   function pad(string, len, fill){ while (string.length < len) string= fill + string; return string }
